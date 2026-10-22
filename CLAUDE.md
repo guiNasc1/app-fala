@@ -1,7 +1,9 @@
 # app-fala
 
 App Android nativo, criado do zero e levado a sério (não é projeto de estudo descartável).
-A ideia do produto será definida pelo usuário — registrar aqui quando chegar.
+Orçamentos e notas de serviço **ditados por voz** para uma oficina de motos (o pai do usuário, leigo em tecnologia):
+uma IA extrai peça, quantidade e valor de cada fala e o app gera o PDF.
+**Especificação completa em [docs/IDEIA.md](docs/IDEIA.md)** — leia antes de mexer em telas ou fluxos.
 
 ## Quem é o usuário
 
@@ -20,6 +22,9 @@ A ideia do produto será definida pelo usuário — registrar aqui quando chegar
   - **Nunca** conectar direto no Postgres, nem embutir a `service_role`/secret key ou a senha do banco no app.
   - A segurança vem de **RLS** em toda tabela. Todo SQL de tabela nova sai junto com suas policies.
   - O SQL (tabelas, policies) fica versionado em `supabase/` e o usuário roda no SQL Editor do Supabase.
+- **IA (extração dos itens ditados):** a chave da API de LLM **nunca** vai no APK. O app chama uma
+  **Supabase Edge Function** autenticada (JWT do usuário), e a chave do LLM fica nos secrets do Supabase.
+  Fala → texto pode ser feito no aparelho (`SpeechRecognizer`, pt-BR) e só o texto vai para a função.
 - URL e chave ficam em `local.properties` (fora do git: `supabase.url`, `supabase.publishableKey`)
   e chegam ao código via `BuildConfig`.
 
