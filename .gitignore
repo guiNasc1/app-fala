@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+build/
+**/build/
+.kotlin/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Configuração local (SDK e chaves do Supabase) — nunca versionar
+local.properties
+
+# Assinatura do app
+*.jks
+*.keystore
+
+# Sistema
+.DS_Store
+Thumbs.db
