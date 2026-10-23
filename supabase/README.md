@@ -15,6 +15,7 @@ Cada arquivo numerado é uma "migração": rode **na ordem**, uma vez, no **SQL 
 | Arquivo | O que cria |
 |---|---|
 | `001_oficinas.sql` | Tabela `oficinas` (dados da oficina de cada conta), RLS e o gatilho que copia os dados do cadastro |
+| `002_documentos.sql` | Tabelas `documentos` e `itens_documento`, RLS, numeração sequencial e a função `emitir_documento` (salva tudo numa transação) |
 
 Regras do projeto:
 

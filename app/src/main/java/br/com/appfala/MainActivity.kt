@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import br.com.appfala.ui.AppViewModel
+import br.com.appfala.ui.DocumentosViewModel
 import br.com.appfala.ui.EmissaoViewModel
 import br.com.appfala.ui.EstruturaPrincipal
 import br.com.appfala.ui.Tela
@@ -34,9 +35,13 @@ class MainActivity : ComponentActivity() {
             // viewModel() devolve sempre a mesma instância enquanto a Activity existir (como um bean com escopo).
             val vm: AppViewModel = viewModel()
             val emissao: EmissaoViewModel = viewModel()
-            // Saiu da conta: o rascunho em andamento não pode passar para a próxima pessoa.
+            val documentos: DocumentosViewModel = viewModel()
+            // Saiu da conta: rascunho, histórico e PDF aberto não podem passar para a próxima pessoa.
             LaunchedEffect(vm.tela) {
-                if (vm.tela == Tela.LOGIN) emissao.recomecar()
+                if (vm.tela == Tela.LOGIN) {
+                    emissao.recomecar()
+                    documentos.limpar()
+                }
             }
             // Ícones da barra de status claros sobre o cabeçalho escuro; escuros no login (fundo claro).
             val topoClaro = !vm.modoEscuro && (vm.tela == Tela.LOGIN || vm.tela == Tela.CARREGANDO)
@@ -58,7 +63,7 @@ class MainActivity : ComponentActivity() {
                         Tela.LOGIN -> TelaLogin(vm)
                         Tela.CADASTRO -> TelaCadastro(vm, edicao = false)
                         Tela.DADOS_OFICINA -> TelaCadastro(vm, edicao = true)
-                        Tela.PRINCIPAL -> EstruturaPrincipal(vm, emissao)
+                        Tela.PRINCIPAL -> EstruturaPrincipal(vm, emissao, documentos)
                     }
                 }
             }

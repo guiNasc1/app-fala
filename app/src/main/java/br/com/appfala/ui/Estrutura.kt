@@ -41,23 +41,34 @@ import br.com.appfala.ui.tema.CoresCabecalho
  * preenche o meio.
  */
 @Composable
-fun EstruturaPrincipal(vm: AppViewModel, emissao: EmissaoViewModel) {
+fun EstruturaPrincipal(vm: AppViewModel, emissao: EmissaoViewModel, documentos: DocumentosViewModel) {
+    val aberto = documentos.aberto
     // Voltar do Android numa aba qualquer leva ao Início; no Início, fecha o app (padrão do sistema).
-    BackHandler(enabled = vm.aba != Aba.INICIO) { vm.irPara(Aba.INICIO) }
+    // Com um PDF aberto, quem trata o voltar é a TelaDocumento (fecha o PDF).
+    BackHandler(enabled = vm.aba != Aba.INICIO && aberto == null) { vm.irPara(Aba.INICIO) }
 
     Scaffold(
         topBar = { Cabecalho(vm.oficina?.nomeExibicao ?: "Fala Oficina", vm.modoEscuro, vm::alternarModoEscuro) },
-        bottomBar = { BarraInferior(vm.aba, vm::irPara) },
+        bottomBar = {
+            BarraInferior(vm.aba) { aba ->
+                documentos.fechar()
+                vm.irPara(aba)
+            }
+        },
     ) { espacos ->
         // `espacos` são as margens ocupadas pelo cabeçalho e pela barra; o conteúdo respeita isso.
         Column(Modifier.padding(espacos).fillMaxSize()) {
             vm.aviso?.let { AvisoComBotao(it, "Tentar de novo", vm::recarregarOficina) }
             Box(Modifier.weight(1f)) {
-                when (vm.aba) {
-                    Aba.INICIO -> TelaEmBreve(R.drawable.ic_inicio, "Início", "Aqui vão os gráficos com os valores de cada mês.")
-                    Aba.EMITIR -> TelaEmitir(emissao)
-                    Aba.HISTORICO -> TelaEmBreve(R.drawable.ic_historico, "Histórico", "Aqui aparecem os documentos já emitidos.")
-                    Aba.PERFIL -> TelaPerfil(vm)
+                if (aberto != null) {
+                    TelaDocumento(aberto, aoFechar = documentos::fechar)
+                } else {
+                    when (vm.aba) {
+                        Aba.INICIO -> TelaEmBreve(R.drawable.ic_inicio, "Início", "Aqui vão os gráficos com os valores de cada mês.")
+                        Aba.EMITIR -> TelaEmitir(emissao, vm.oficina, aoEmitir = documentos::mostrarEmitido)
+                        Aba.HISTORICO -> TelaHistorico(documentos)
+                        Aba.PERFIL -> TelaPerfil(vm)
+                    }
                 }
             }
         }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,6 +30,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -68,7 +70,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import br.com.appfala.R
 import br.com.appfala.data.Cliente
+import br.com.appfala.data.DocumentoCompleto
 import br.com.appfala.data.ItemDocumento
+import br.com.appfala.data.Oficina
 import br.com.appfala.data.TipoDocumento
 import br.com.appfala.data.TipoItem
 import br.com.appfala.data.Veiculo
@@ -80,10 +84,14 @@ import br.com.appfala.voz.ReconhecedorDeFala
 /** Vermelho vivo do microfone enquanto ouve (igual nos dois temas, para chamar atenção). */
 private val VermelhoGravando = Color(0xFFD32F2F)
 
+/**
+ * @param oficina dados da oficina, copiados para o documento no momento da emissão.
+ * @param aoEmitir recebe o documento salvo (para gerar e mostrar o PDF).
+ */
 @Composable
-fun TelaEmitir(vm: EmissaoViewModel) {
+fun TelaEmitir(vm: EmissaoViewModel, oficina: Oficina?, aoEmitir: suspend (DocumentoCompleto) -> Unit) {
     val tipo = vm.tipo
-    if (tipo == null) EscolhaDoTipo(vm::escolher) else TelaDitado(vm, tipo)
+    if (tipo == null) EscolhaDoTipo(vm::escolher) else TelaDitado(vm, tipo) { vm.emitir(oficina, aoEmitir) }
 }
 
 // ==================================================================== escolha do tipo
@@ -131,10 +139,11 @@ private fun CartaoTipo(tipo: TipoDocumento, aoClicar: () -> Unit) {
 // ==================================================================== ditado
 
 @Composable
-private fun TelaDitado(vm: EmissaoViewModel, tipo: TipoDocumento) {
+private fun TelaDitado(vm: EmissaoViewModel, tipo: TipoDocumento, aoRealizar: () -> Unit) {
     val contexto = LocalContext.current
     var digitando by rememberSaveable { mutableStateOf(false) }
     var confirmarDescarte by rememberSaveable { mutableStateOf(false) }
+    var confirmarEmissao by rememberSaveable { mutableStateOf(false) }
 
     // O reconhecedor vive enquanto esta tela estiver aberta: `remember` cria uma vez e o
     // DisposableEffect libera ao sair (como @PostConstruct / @PreDestroy).
@@ -208,7 +217,31 @@ private fun TelaDitado(vm: EmissaoViewModel, tipo: TipoDocumento) {
             if (vazio) item { Dica() }
         }
 
-        PainelDeGravacao(vm, aoTocarMicrofone, aoDigitar = { digitando = true })
+        PainelDeGravacao(vm, tipo, aoTocarMicrofone, aoDigitar = { digitando = true }, aoRealizar = { confirmarEmissao = true })
+    }
+
+    if (confirmarEmissao) {
+        val quantos = vm.itens.size
+        AlertDialog(
+            onDismissRequest = { confirmarEmissao = false },
+            title = { Text(if (tipo == TipoDocumento.ORCAMENTO) "Gerar o orçamento?" else "Gerar a nota de serviço?") },
+            text = {
+                Text(
+                    "$quantos ${if (quantos == 1) "item" else "itens"} · Total ${reais(vm.total)}\n" +
+                        "Depois de gerado, ele vai para o Histórico e não pode mais ser mudado.",
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmarEmissao = false
+                    aoRealizar()
+                }) { Text("Gerar", fontSize = 17.sp) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmarEmissao = false }) { Text("Voltar", fontSize = 17.sp) }
+            },
+        )
     }
 
     if (digitando) {
@@ -324,7 +357,13 @@ private fun Dica() {
 // ==================================================================== rodapé com o microfone
 
 @Composable
-private fun PainelDeGravacao(vm: EmissaoViewModel, aoTocarMicrofone: () -> Unit, aoDigitar: () -> Unit) {
+private fun PainelDeGravacao(
+    vm: EmissaoViewModel,
+    tipo: TipoDocumento,
+    aoTocarMicrofone: () -> Unit,
+    aoDigitar: () -> Unit,
+    aoRealizar: () -> Unit,
+) {
     Surface(color = MaterialTheme.colorScheme.surfaceContainer, shadowElevation = 8.dp) {
         Column(
             Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
@@ -334,8 +373,22 @@ private fun PainelDeGravacao(vm: EmissaoViewModel, aoTocarMicrofone: () -> Unit,
             vm.aviso?.let { FaixaAviso(it, aoAcao = vm::executar, aoFechar = { vm.aviso = null }) }
 
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("Total", Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
-                Text(reais(vm.total), fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                Column(Modifier.weight(1f)) {
+                    Text("Total", style = MaterialTheme.typography.titleMedium)
+                    Text(reais(vm.total), fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                }
+                Button(
+                    onClick = aoRealizar,
+                    enabled = vm.podeEmitir,
+                    modifier = Modifier.height(56.dp),
+                ) {
+                    if (vm.emitindo) CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 3.dp)
+                    else Text(
+                        if (tipo == TipoDocumento.ORCAMENTO) "Realizar orçamento" else "Realizar nota",
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
 
             if (vm.ouvindo) {

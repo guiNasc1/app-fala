@@ -60,12 +60,14 @@ Extraia da fala:
    - descricao: o nome formal, como num orçamento profissional de oficina de motos. Use a
      terminologia técnica usual e a descrição técnica padrão da peça; pode completar com o que
      é próprio da peça, mas não invente marca, medida, código ou quantidade que não foram ditos.
-     Mantenha medidas ditas (ex.: "88,90 mm"). Indique "(jogo)" ou "(par)" quando for o caso.
+     Mantenha medidas ditas (ex.: "88,90 mm"). Escreva "(jogo)" ou "(par)" só quando a pessoa disser
+     "jogo" ou "par"; nesse caso a quantidade conta jogos/pares. Itens contados um a um ("dois cilindros")
+     ficam no singular, sem "(par)": a quantidade já diz quantos são.
      Comece com letra maiúscula.
      Exemplo: "um jogo de rolamento principal do virabrequim" vira
      "Rolamentos principais do virabrequim - sprocket shaft e pinion shaft, com pista interna (jogo)".
    - tipo: SERVICO para mão de obra e serviços; PECA para peças e materiais.
-   - quantidade: número de unidades ("duas" = 2, "um jogo" = 1, "um par" = 1). Se não disser, 1.
+   - quantidade: número de unidades ("duas" = 2, "um jogo" = 1, "dois pares" = 2). Se não disser, 1.
    - valor: em reais, como número ("mil e cento e cinco" = 1105; "novecentos e noventa" = 990;
      "mil e trinta" = 1030; "trinta e cinco e cinquenta" = 35.5). Cuidado: medidas como
      "88,90 milímetros" não são preço.

@@ -8,12 +8,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.appfala.data.Cliente
+import br.com.appfala.data.DocumentoCompleto
+import br.com.appfala.data.DocumentosRepositorio
 import br.com.appfala.data.IaRepositorio
 import br.com.appfala.data.ItemDocumento
+import br.com.appfala.data.Oficina
 import br.com.appfala.data.Preferencias
 import br.com.appfala.data.ResultadoIa
 import br.com.appfala.data.TipoDocumento
 import br.com.appfala.data.Veiculo
+import br.com.appfala.data.mensagemDeErro
 import br.com.appfala.data.mensagemDeErroIa
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -52,6 +56,7 @@ private data class Rascunho(
  */
 class EmissaoViewModel(app: Application) : AndroidViewModel(app) {
     private val ia = IaRepositorio()
+    private val documentos = DocumentosRepositorio()
     private val preferencias = Preferencias(app)
 
     // Garante que as falas sejam processadas uma de cada vez, na ordem em que foram ditas
@@ -75,8 +80,13 @@ class EmissaoViewModel(app: Application) : AndroidViewModel(app) {
     var textoAoVivo by mutableStateOf("")
     var volume by mutableStateOf(0f)
     var aviso by mutableStateOf<Aviso?>(null)
+    var emitindo by mutableStateOf(false)
+        private set
 
     val total: Long get() = itens.sumOf { it.valorTotalCentavos }
+
+    /** Dá para gerar o documento: tem item, nada esperando a IA e o microfone parado. */
+    val podeEmitir: Boolean get() = itens.isNotEmpty() && pendentes.isEmpty() && !ouvindo && !emitindo
 
     init {
         preferencias.rascunho?.let { salvo ->
@@ -172,6 +182,36 @@ class EmissaoViewModel(app: Application) : AndroidViewModel(app) {
             else -> null
         }
         salvarRascunho()
+    }
+
+    // ---------------------------------------------------------------- emissão
+
+    /**
+     * Salva o documento no Supabase e, se deu certo, entrega para `aoEmitir` (que gera e mostra o
+     * PDF) e limpa o rascunho. Roda no escopo do ViewModel: termina mesmo se a tela mudar no meio.
+     */
+    fun emitir(oficina: Oficina?, aoEmitir: suspend (DocumentoCompleto) -> Unit) {
+        val t = tipo ?: return
+        if (!podeEmitir) return
+        if (oficina == null) {
+            aviso = Aviso("Os dados da oficina não carregaram. Confira a internet e tente de novo.")
+            return
+        }
+        emitindo = true
+        aviso = null
+        viewModelScope.launch {
+            try {
+                val completo = documentos.emitir(t, veiculo, cliente, oficina, itens.toList())
+                aoEmitir(completo)
+                recomecar()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                aviso = Aviso("Não foi possível salvar: ${mensagemDeErro(e)}")
+            } finally {
+                emitindo = false
+            }
+        }
     }
 
     fun remover(item: ItemDocumento) {

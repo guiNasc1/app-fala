@@ -49,7 +49,7 @@ fun TelaPerfil(vm: AppViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.height(8.dp))
-        // Foto: por enquanto as iniciais. A foto de verdade entra junto com o Storage, na fase do PDF.
+        // Foto: por enquanto as iniciais. A foto de verdade precisa do Storage do Supabase (etapa futura).
         Box(
             Modifier.size(104.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center,
