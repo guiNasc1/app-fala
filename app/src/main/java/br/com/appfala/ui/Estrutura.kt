@@ -64,7 +64,7 @@ fun EstruturaPrincipal(vm: AppViewModel, emissao: EmissaoViewModel, documentos: 
                     TelaDocumento(aberto, aoFechar = documentos::fechar)
                 } else {
                     when (vm.aba) {
-                        Aba.INICIO -> TelaEmBreve(R.drawable.ic_inicio, "Início", "Aqui vão os gráficos com os valores de cada mês.")
+                        Aba.INICIO -> TelaInicio(documentos, vm.oficina?.nomeUsuario)
                         Aba.EMITIR -> TelaEmitir(emissao, vm.oficina, aoEmitir = documentos::mostrarEmitido)
                         Aba.HISTORICO -> TelaHistorico(documentos)
                         Aba.PERFIL -> TelaPerfil(vm)
@@ -142,17 +142,3 @@ private val Aba.icone: Int
         Aba.HISTORICO -> R.drawable.ic_historico
         Aba.PERFIL -> R.drawable.ic_perfil
     }
-
-/** Conteúdo provisório das abas até cada fase ficar pronta. */
-@Composable
-private fun TelaEmBreve(@DrawableRes icone: Int, titulo: String, texto: String) {
-    Column(
-        Modifier.fillMaxSize().padding(32.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Icon(painterResource(icone), contentDescription = null, Modifier.size(72.dp), tint = MaterialTheme.colorScheme.primary)
-        Text(titulo, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        Text(texto, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
-    }
-}

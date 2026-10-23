@@ -78,6 +78,25 @@ fun AppFalaTheme(modoEscuro: Boolean, content: @Composable () -> Unit) {
     }
 }
 
+/**
+ * Cor de cada tipo de documento, igual em todo o app (gráfico do Início, etiquetas do Histórico):
+ * vermelho = orçamento, azul = nota. Validadas para daltonismo e contraste nos dois temas.
+ */
+object CoresDocumento {
+    /** Barras do gráfico. */
+    val orcamento: Color
+        @Composable @ReadOnlyComposable
+        get() = if (LocalModoEscuro.current) Color(0xFFE05555) else Color(0xFFB3261E)
+
+    val nota: Color
+        @Composable @ReadOnlyComposable
+        get() = if (LocalModoEscuro.current) Color(0xFF3987E5) else Color(0xFF2A78D6)
+
+    /** Fundo das etiquetas (com texto branco por cima): tons mais escuros, para o texto ficar legível. */
+    val etiquetaOrcamento = VermelhoEscuro
+    val etiquetaNota = Color(0xFF1C5CAB)
+}
+
 /** Cores do cabeçalho: faixa vermelha no claro; no escuro, superfície escura com o nome em rosado. */
 object CoresCabecalho {
     val fundo: Color

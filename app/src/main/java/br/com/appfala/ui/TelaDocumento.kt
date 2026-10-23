@@ -75,8 +75,8 @@ fun TelaDocumento(aberto: DocumentoAberto, aoFechar: () -> Unit) {
     var recado by remember(aberto) {
         mutableStateOf(
             if (aberto.recemEmitido) {
-                val artigo = if (documento.tipo == TipoDocumento.ORCAMENTO) "O orçamento" else "A nota"
-                "Pronto! $artigo foi salvo e já está no Histórico."
+                val oQue = if (documento.tipo == TipoDocumento.ORCAMENTO) "O orçamento foi salvo" else "A nota foi salva"
+                "Pronto! $oQue e já está no Histórico."
             } else null
         )
     }

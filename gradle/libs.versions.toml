@@ -9,6 +9,7 @@ lifecycle = "2.10.0"
 composeBom = "2026.06.01"
 coroutines = "1.10.2"
 serializationJson = "1.11.0"
+junit = "4.13.2"
 supabase = "3.8.0"
 ktor = "3.5.1"
 
@@ -21,6 +22,7 @@ androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serializationJson" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 # supabase-kt: o BOM fixa a mesma versão para todos os módulos (auth, postgrest, functions).
 supabase-bom = { group = "io.github.jan-tennert.supabase", name = "bom", version.ref = "supabase" }
 supabase-auth = { group = "io.github.jan-tennert.supabase", name = "auth-kt" }

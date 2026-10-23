@@ -2,10 +2,12 @@ package br.com.appfala.data
 
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.rpc
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -52,6 +54,18 @@ data class ItemSalvo(
 
 /** Documento com os itens: tudo o que o PDF precisa. */
 data class DocumentoCompleto(val documento: DocumentoSalvo, val itens: List<ItemSalvo>)
+
+/** Só o necessário para os gráficos do Início: tipo, total e quando foi emitido. */
+@Serializable
+data class LinhaResumo(
+    val tipo: TipoDocumento,
+    @SerialName("total_centavos") val totalCentavos: Long,
+    @SerialName("criado_em") val criadoEm: String,
+) {
+    /** Data/hora no fuso dado (padrão: o do celular). O parâmetro existe para os testes fixarem o fuso. */
+    fun emitidoEm(zona: ZoneId = ZoneId.systemDefault()): ZonedDateTime =
+        OffsetDateTime.parse(criadoEm).atZoneSameInstant(zona)
+}
 
 /** Parâmetros da função SQL emitir_documento (supabase/002_documentos.sql). */
 @Serializable
@@ -101,9 +115,32 @@ class DocumentosRepositorio {
             limit(300)
         }.decodeList<DocumentoSalvo>()
 
+    /**
+     * Documentos emitidos a partir de `inicio`, só com tipo, total e data. Vem em páginas de 1.000
+     * linhas (o limite padrão da API do Supabase), para não cortar nada num mês movimentado.
+     */
+    suspend fun resumoDesde(inicio: Instant): List<LinhaResumo> {
+        val todas = mutableListOf<LinhaResumo>()
+        var de = 0L
+        while (true) {
+            val pagina = Supabase.cliente.from("documentos").select(Columns.list("tipo", "total_centavos", "criado_em")) {
+                filter { gte("criado_em", inicio.toString()) }
+                order("criado_em", Order.ASCENDING)
+                range(de, de + TAMANHO_PAGINA - 1)
+            }.decodeList<LinhaResumo>()
+            todas += pagina
+            if (pagina.size < TAMANHO_PAGINA) return todas
+            de += TAMANHO_PAGINA
+        }
+    }
+
     suspend fun itens(documentoId: String): List<ItemSalvo> =
         Supabase.cliente.from("itens_documento").select {
             filter { eq("documento_id", documentoId) }
             order("ordem", Order.ASCENDING)
         }.decodeList<ItemSalvo>()
+
+    private companion object {
+        const val TAMANHO_PAGINA = 1000L
+    }
 }

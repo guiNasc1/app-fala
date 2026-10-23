@@ -226,9 +226,13 @@ private fun TelaDitado(vm: EmissaoViewModel, tipo: TipoDocumento, aoRealizar: ()
             onDismissRequest = { confirmarEmissao = false },
             title = { Text(if (tipo == TipoDocumento.ORCAMENTO) "Gerar o orçamento?" else "Gerar a nota de serviço?") },
             text = {
+                val depois = if (tipo == TipoDocumento.ORCAMENTO) {
+                    "Depois de gerado, ele vai para o Histórico e não pode mais ser mudado."
+                } else {
+                    "Depois de gerada, ela vai para o Histórico e não pode mais ser mudada."
+                }
                 Text(
-                    "$quantos ${if (quantos == 1) "item" else "itens"} · Total ${reais(vm.total)}\n" +
-                        "Depois de gerado, ele vai para o Histórico e não pode mais ser mudado.",
+                    "$quantos ${if (quantos == 1) "item" else "itens"} · Total ${reais(vm.total)}\n$depois",
                     style = MaterialTheme.typography.bodyLarge,
                 )
             },

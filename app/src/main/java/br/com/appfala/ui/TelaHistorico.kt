@@ -1,8 +1,6 @@
 package br.com.appfala.ui
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import br.com.appfala.R
 import br.com.appfala.data.DocumentoSalvo
 import br.com.appfala.data.TipoDocumento
-import br.com.appfala.ui.tema.VermelhoEscuro
+import br.com.appfala.ui.tema.CoresDocumento
 import br.com.appfala.util.reais
 
 @Composable
@@ -103,19 +101,17 @@ private fun CartaoDocumento(doc: DocumentoSalvo, aoAbrir: () -> Unit) {
     }
 }
 
-/** Etiqueta que diferencia os tipos: Orçamento cheia (vermelha), Nota com contorno. */
+/** Etiqueta do tipo, nas mesmas cores do gráfico do Início: vermelho = orçamento, azul = nota. */
 @Composable
 private fun Etiqueta(tipo: TipoDocumento) {
-    val forma = RoundedCornerShape(6.dp)
-    val modificador = if (tipo == TipoDocumento.ORCAMENTO) {
-        Modifier.clip(forma).background(VermelhoEscuro)
-    } else {
-        Modifier.border(BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary), forma)
-    }
+    val orcamento = tipo == TipoDocumento.ORCAMENTO
     Text(
-        if (tipo == TipoDocumento.ORCAMENTO) "ORÇAMENTO" else "NOTA DE SERVIÇO",
-        modificador.padding(horizontal = 8.dp, vertical = 3.dp),
-        color = if (tipo == TipoDocumento.ORCAMENTO) Color.White else MaterialTheme.colorScheme.primary,
+        if (orcamento) "ORÇAMENTO" else "NOTA DE SERVIÇO",
+        Modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(if (orcamento) CoresDocumento.etiquetaOrcamento else CoresDocumento.etiquetaNota)
+            .padding(horizontal = 8.dp, vertical = 3.dp),
+        color = Color.White,
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         letterSpacing = 0.5.sp,

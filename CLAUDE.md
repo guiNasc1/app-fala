@@ -42,6 +42,14 @@ uma IA extrai peça, quantidade e valor de cada fala e o app gera o PDF.
   O emulador não recebe áudio do PC por padrão: teste as falas pelo botão **Digitar** (`adb shell input text`,
   sem acentos, espaços como `%s`).
 
+## Convenções do app
+
+- **Cor por tipo de documento, igual em todo o app:** vermelho = orçamento, azul = nota
+  (`CoresDocumento` em `ui/tema/Tema.kt`). As cores do gráfico foram validadas para daltonismo e contraste
+  nos dois temas; ao mudar, revalide.
+- Dinheiro sempre em centavos (`Long`); datas do banco em UTC, convertidas para o fuso do celular na tela.
+- Testes unitários (JVM, sem emulador): `./gradlew testDebugUnitTest`.
+
 ## IA da emissão (Edge Function `supabase/functions/extrair-item`)
 
 - Decisão do usuário (2026-10-22): **Gemini gratuito para testes** e, no futuro, **Claude Haiku 5.5**.

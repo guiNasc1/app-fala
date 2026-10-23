@@ -68,4 +68,7 @@ dependencies {
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.functions)
     implementation(libs.ktor.client.okhttp)
+
+    // Testes que rodam no PC (JVM), sem emulador: ./gradlew testDebugUnitTest
+    testImplementation(libs.junit)
 }

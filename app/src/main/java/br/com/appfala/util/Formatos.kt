@@ -6,7 +6,11 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.YearMonth
+import java.time.format.TextStyle
+import java.util.Locale
 import kotlin.math.abs
+import kotlin.math.roundToLong
 
 /**
  * CNPJ numérico e alfanumérico (formato novo da Receita, a partir de jul/2026):
@@ -61,6 +65,31 @@ fun formatarValor(centavos: Long): String {
 
 /** 103000 -> "R$ 1.030,00" */
 fun reais(centavos: Long) = "R$ " + formatarValor(centavos)
+
+/** Valor curto para o eixo do gráfico: 822000 -> "R$ 8,2 mil"; 125000000 -> "R$ 1,3 mi"; 0 -> "R$ 0". */
+fun reaisCompacto(centavos: Long): String {
+    val reais = centavos / 100.0
+    return when {
+        reais >= 1_000_000 -> "R$ ${umaCasaDecimal(reais / 1_000_000)} mi"
+        reais >= 1_000 -> "R$ ${umaCasaDecimal(reais / 1_000)} mil"
+        else -> "R$ ${reais.roundToLong()}"
+    }
+}
+
+private fun umaCasaDecimal(v: Double): String {
+    val arredondado = (v * 10).roundToLong() / 10.0
+    return if (arredondado % 1.0 == 0.0) arredondado.toLong().toString() else arredondado.toString().replace('.', ',')
+}
+
+private val PORTUGUES = Locale.forLanguageTag("pt-BR")
+
+/** 2026-10 -> "out" */
+fun mesCurto(mes: YearMonth): String =
+    mes.month.getDisplayName(TextStyle.SHORT, PORTUGUES).replace(".", "").take(3).lowercase()
+
+/** 2026-10 -> "outubro de 2026" */
+fun mesPorExtenso(mes: YearMonth): String =
+    "${mes.month.getDisplayName(TextStyle.FULL, PORTUGUES).lowercase()} de ${mes.year}"
 
 /** 2.0 -> "2"; 1.5 -> "1,5" */
 fun formatarQuantidade(q: Double): String =
