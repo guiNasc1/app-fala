@@ -34,5 +34,10 @@ uma IA extrai peça, quantidade e valor de cada fala e o app gera o PDF.
 - Android SDK em `C:\Users\guilh\AppData\Local\Android\Sdk`. JDK 21 no JAVA_HOME.
 - Referência de versões que já funcionaram nesta máquina (projeto `AndroidStudioProjects\NotaServico`):
   AGP 9.0.1 (Kotlin embutido), plugin Kotlin Compose 2.2.10, Gradle 9.2.1, Compose BOM 2026.06.01, minSdk 26.
+- **Neste projeto o Kotlin é 2.4.21** (não 2.2.10): a `supabase-kt` 3.7+ é compilada com Kotlin 2.4.
+  O AGP continua 9.0.1; o plugin `org.jetbrains.kotlin.android` declarado com `apply false` no build da raiz
+  faz o AGP usar o Kotlin mais novo. Não "corrigir" de volta.
+- Emulador `Medium_Phone_API_36.1`: a primeira abertura depois de instalar leva ~7 s (debug); as seguintes ~2-3 s.
+  O usuário costuma mexer no emulador junto: antes de tocar na tela via `adb`, tire um screenshot.
 - Repositório: https://github.com/guiNasc1/app-fala (privado), branch `main`. `gh` CLI não instalado.
 - No Git Bash, comandos `adb` com caminhos precisam de `MSYS_NO_PATHCONV=1`.

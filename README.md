@@ -16,16 +16,18 @@ A especificação está em [docs/IDEIA.md](docs/IDEIA.md) e as decisões de arqu
    ```
 
    Só a URL do projeto e a chave **publishable**. Nunca coloque a `service_role`/secret key nem a senha do banco.
-3. Rode o app (▶) num emulador ou celular com Android 8.0 (API 26) ou mais novo.
+3. Rode os scripts de [`supabase/`](supabase/README.md) no SQL Editor do Supabase, na ordem.
+4. Rode o app (▶) num emulador ou celular com Android 8.0 (API 26) ou mais novo.
 
 ## Estrutura
 
 ```
 app/src/main/java/br/com/appfala/
 ├── MainActivity.kt      ponto de entrada; liga o tema e a tela
-├── data/                acesso a dados (Supabase, preferências do aparelho)
-└── ui/                  telas Compose + ViewModel
-    └── tema/            cores e tipografia (claro e escuro)
+├── data/                acesso a dados (Supabase, BrasilAPI, preferências do aparelho)
+├── ui/                  telas Compose + ViewModel
+│   └── tema/            cores e tipografia (claro e escuro)
+└── util/                CNPJ e máscaras de campo
 supabase/                SQL das tabelas e policies (rodar no SQL Editor do Supabase)
 ```
 

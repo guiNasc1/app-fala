@@ -14,4 +14,14 @@ class Preferencias(context: Context) {
     var modoEscuro: Boolean
         get() = prefs.getBoolean("modo_escuro", false)
         set(valor) = prefs.edit().putBoolean("modo_escuro", valor).apply()
+
+    /** Se ligado, ao abrir o app a sessão salva é usada e ele vai direto para o Início. */
+    var lembrarDeMim: Boolean
+        get() = prefs.getBoolean("lembrar_de_mim", true)
+        set(valor) = prefs.edit().putBoolean("lembrar_de_mim", valor).apply()
+
+    /** Último e-mail que entrou, para já vir preenchido no login. Nunca guardamos a senha. */
+    var ultimoEmail: String
+        get() = prefs.getString("ultimo_email", "").orEmpty()
+        set(valor) = prefs.edit().putString("ultimo_email", valor).apply()
 }

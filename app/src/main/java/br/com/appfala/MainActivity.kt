@@ -6,10 +6,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import br.com.appfala.ui.AppViewModel
 import br.com.appfala.ui.EstruturaPrincipal
+import br.com.appfala.ui.Tela
+import br.com.appfala.ui.TelaCadastro
+import br.com.appfala.ui.TelaLogin
 import br.com.appfala.ui.tema.AppFalaTheme
 
 /**
@@ -23,17 +32,29 @@ class MainActivity : ComponentActivity() {
         setContent {
             // viewModel() devolve sempre a mesma instância enquanto a Activity existir (como um bean com escopo).
             val vm: AppViewModel = viewModel()
-            // Barra de status com ícones claros (o cabeçalho é escuro nos dois modos);
-            // barra de navegação do sistema acompanha o modo do app.
-            LaunchedEffect(vm.modoEscuro) {
+            // Ícones da barra de status claros sobre o cabeçalho escuro; escuros no login (fundo claro).
+            val topoClaro = !vm.modoEscuro && (vm.tela == Tela.LOGIN || vm.tela == Tela.CARREGANDO)
+            LaunchedEffect(vm.modoEscuro, topoClaro) {
                 enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+                    statusBarStyle = if (topoClaro) SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                    else SystemBarStyle.dark(Color.TRANSPARENT),
                     navigationBarStyle = if (vm.modoEscuro) SystemBarStyle.dark(Color.TRANSPARENT)
                     else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
                 )
             }
             AppFalaTheme(modoEscuro = vm.modoEscuro) {
-                EstruturaPrincipal(vm)
+                Surface(Modifier.fillMaxSize()) {
+                    // "Navegação" por estado: troca a tela inteira conforme vm.tela, como um ui:include dinâmico.
+                    when (vm.tela) {
+                        Tela.CARREGANDO -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                        Tela.LOGIN -> TelaLogin(vm)
+                        Tela.CADASTRO -> TelaCadastro(vm, edicao = false)
+                        Tela.DADOS_OFICINA -> TelaCadastro(vm, edicao = true)
+                        Tela.PRINCIPAL -> EstruturaPrincipal(vm)
+                    }
+                }
             }
         }
     }

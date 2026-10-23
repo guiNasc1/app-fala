@@ -1,10 +1,14 @@
 package br.com.appfala.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +20,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -37,19 +42,37 @@ import br.com.appfala.ui.tema.CoresCabecalho
  */
 @Composable
 fun EstruturaPrincipal(vm: AppViewModel) {
+    // Voltar do Android numa aba qualquer leva ao Início; no Início, fecha o app (padrão do sistema).
+    BackHandler(enabled = vm.aba != Aba.INICIO) { vm.irPara(Aba.INICIO) }
+
     Scaffold(
-        topBar = { Cabecalho(vm.nomeOficina, vm.modoEscuro, vm::alternarModoEscuro) },
+        topBar = { Cabecalho(vm.oficina?.nomeExibicao ?: "Fala Oficina", vm.modoEscuro, vm::alternarModoEscuro) },
         bottomBar = { BarraInferior(vm.aba, vm::irPara) },
     ) { espacos ->
         // `espacos` são as margens ocupadas pelo cabeçalho e pela barra; o conteúdo respeita isso.
-        Box(Modifier.padding(espacos).fillMaxSize()) {
-            when (vm.aba) {
-                Aba.INICIO -> TelaEmBreve(R.drawable.ic_inicio, "Início", "Aqui vão os gráficos com os valores de cada mês.")
-                Aba.EMITIR -> TelaEmBreve(R.drawable.ic_emitir, "Emitir", "Aqui você vai ditar o orçamento ou a nota de serviço.")
-                Aba.HISTORICO -> TelaEmBreve(R.drawable.ic_historico, "Histórico", "Aqui aparecem os documentos já emitidos.")
-                Aba.PERFIL -> TelaEmBreve(R.drawable.ic_perfil, "Perfil", "Aqui ficam os dados da sua conta e da oficina.")
+        Column(Modifier.padding(espacos).fillMaxSize()) {
+            vm.aviso?.let { AvisoComBotao(it, "Tentar de novo", vm::recarregarOficina) }
+            Box(Modifier.weight(1f)) {
+                when (vm.aba) {
+                    Aba.INICIO -> TelaEmBreve(R.drawable.ic_inicio, "Início", "Aqui vão os gráficos com os valores de cada mês.")
+                    Aba.EMITIR -> TelaEmBreve(R.drawable.ic_emitir, "Emitir", "Aqui você vai ditar o orçamento ou a nota de serviço.")
+                    Aba.HISTORICO -> TelaEmBreve(R.drawable.ic_historico, "Histórico", "Aqui aparecem os documentos já emitidos.")
+                    Aba.PERFIL -> TelaPerfil(vm)
+                }
             }
         }
+    }
+}
+
+/** Faixa de aviso no topo do conteúdo (ex.: sem internet ao carregar a oficina). */
+@Composable
+private fun AvisoComBotao(texto: String, botao: String, aoClicar: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.errorContainer).padding(start = 16.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(texto, Modifier.weight(1f).padding(vertical = 12.dp), color = MaterialTheme.colorScheme.onErrorContainer)
+        TextButton(onClick = aoClicar) { Text(botao) }
     }
 }
 
