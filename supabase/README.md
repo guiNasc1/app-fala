@@ -23,6 +23,16 @@ Regras do projeto:
 - O app só usa a chave **publishable**. Nada aqui exige a `service_role` ou a senha do banco.
 - Mudança em algo já rodado vira um **arquivo novo** (`002_...`), não edição do antigo.
 
+## Manutenção
+
+**Apagar os documentos de teste de uma conta** (os itens vão junto; a numeração recomeça do 1).
+Rode no SQL Editor trocando o e-mail. Sem o `where`, apagaria os documentos de todas as contas:
+
+```sql
+delete from public.documentos
+where user_id = (select id from auth.users where email = 'email-da-conta@exemplo.com');
+```
+
 ## Edge Function `extrair-item` (a IA da emissão por voz)
 
 Recebe o texto de uma fala e devolve veículo, cliente e itens (nome formal, quantidade, valores em centavos).

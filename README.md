@@ -19,6 +19,9 @@ A especificação está em [docs/IDEIA.md](docs/IDEIA.md) e as decisões de arqu
 3. Rode os scripts de [`supabase/`](supabase/README.md) no SQL Editor do Supabase, na ordem.
 4. Rode o app (▶) num emulador ou celular com Android 8.0 (API 26) ou mais novo.
 
+Para gerar a versão de uso real (assinada) e instalar no celular: [docs/INSTALAR.md](docs/INSTALAR.md).
+Testes unitários: `./gradlew testDebugUnitTest`.
+
 ## Estrutura
 
 ```

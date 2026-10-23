@@ -49,6 +49,10 @@ uma IA extrai peça, quantidade e valor de cada fala e o app gera o PDF.
   nos dois temas; ao mudar, revalide.
 - Dinheiro sempre em centavos (`Long`); datas do banco em UTC, convertidas para o fuso do celular na tela.
 - Testes unitários (JVM, sem emulador): `./gradlew testDebugUnitTest`.
+- Release: R8 ligado (APK ~2 MB); assinatura pela `keystore.properties` (fora do git, a chave é do usuário).
+  Sem ela o `packageRelease` falha de propósito. Para testar o release no emulador sem a chave dele:
+  `./gradlew assembleRelease -PreleaseComChaveDeDebug`. Nunca pedir nem ler as senhas da chave.
+  Guia do usuário em [docs/INSTALAR.md](docs/INSTALAR.md).
 
 ## IA da emissão (Edge Function `supabase/functions/extrair-item`)
 

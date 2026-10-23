@@ -24,3 +24,6 @@ Thumbs.db
 
 # Arquivos temporários do CLI do Supabase
 supabase/.temp/
+
+# Assinatura da versão release: caminho e senhas da chave (nunca versionar)
+keystore.properties
