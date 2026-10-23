@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.appfala.R
@@ -96,7 +97,11 @@ fun TelaLogin(vm: AppViewModel) {
                 Icon(painterResource(R.drawable.ic_emitir), contentDescription = null, Modifier.size(52.dp), tint = Color.White)
             }
             Text("Fala Oficina", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-            Text("Orçamentos e notas de serviço por voz", style = MaterialTheme.typography.bodyLarge)
+            Text(
+                "Orçamentos e notas de serviço por voz",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center, // em telas estreitas quebra em duas linhas: fica centralizado
+            )
             Spacer(Modifier.height(8.dp))
 
             vm.aviso?.let { Text(it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.primary) }
