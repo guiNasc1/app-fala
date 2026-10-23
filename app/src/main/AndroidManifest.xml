@@ -3,6 +3,15 @@
 
     <!-- Fala com o Supabase (login, dados da oficina, documentos e a função de IA). -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Microfone para ditar os itens. O Android pergunta ao usuário na primeira vez. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Desde o Android 11 o app precisa declarar que procura o serviço de reconhecimento de voz. -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
 
     <application
         android:allowBackup="true"

@@ -24,4 +24,9 @@ class Preferencias(context: Context) {
     var ultimoEmail: String
         get() = prefs.getString("ultimo_email", "").orEmpty()
         set(valor) = prefs.edit().putString("ultimo_email", valor).apply()
+
+    /** Documento sendo ditado, em JSON. Sobrevive ao Android fechar o app (ex.: durante uma ligação). */
+    var rascunho: String?
+        get() = prefs.getString("rascunho", null)
+        set(valor) = prefs.edit().apply { if (valor == null) remove("rascunho") else putString("rascunho", valor) }.apply()
 }

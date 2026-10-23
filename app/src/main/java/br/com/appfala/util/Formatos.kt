@@ -4,6 +4,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import java.math.BigDecimal
+import java.math.RoundingMode
+import kotlin.math.abs
 
 /**
  * CNPJ numérico e alfanumérico (formato novo da Receita, a partir de jul/2026):
@@ -47,6 +50,22 @@ object Mascaras {
 }
 
 fun soDigitos(s: String, max: Int) = s.filter { it.isDigit() }.take(max)
+
+/** 103000 -> "1.030,00" (veio do NotaServico). */
+fun formatarValor(centavos: Long): String {
+    val a = abs(centavos)
+    val reais = (a / 100).toString().reversed().chunked(3).joinToString(".").reversed()
+    val cents = (a % 100).toString().padStart(2, '0')
+    return (if (centavos < 0) "-" else "") + "$reais,$cents"
+}
+
+/** 103000 -> "R$ 1.030,00" */
+fun reais(centavos: Long) = "R$ " + formatarValor(centavos)
+
+/** 2.0 -> "2"; 1.5 -> "1,5" */
+fun formatarQuantidade(q: Double): String =
+    if (q % 1.0 == 0.0) q.toLong().toString()
+    else BigDecimal(q).setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().toPlainString().replace('.', ',')
 
 /** Encaixa os caracteres de [raw] nos '#' da máscara, parando quando o raw acaba. */
 fun aplicarMascara(raw: String, mascara: String): String {

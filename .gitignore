@@ -21,3 +21,6 @@ local.properties
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Arquivos temporários do CLI do Supabase
+supabase/.temp/

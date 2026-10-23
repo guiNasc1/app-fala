@@ -39,5 +39,16 @@ uma IA extrai peça, quantidade e valor de cada fala e o app gera o PDF.
   faz o AGP usar o Kotlin mais novo. Não "corrigir" de volta.
 - Emulador `Medium_Phone_API_36.1`: a primeira abertura depois de instalar leva ~7 s (debug); as seguintes ~2-3 s.
   O usuário costuma mexer no emulador junto: antes de tocar na tela via `adb`, tire um screenshot.
+  O emulador não recebe áudio do PC por padrão: teste as falas pelo botão **Digitar** (`adb shell input text`,
+  sem acentos, espaços como `%s`).
+
+## IA da emissão (Edge Function `supabase/functions/extrair-item`)
+
+- Decisão do usuário (2026-10-22): **Gemini gratuito para testes** e, no futuro, **Claude Haiku 5.5**.
+  O provedor é escolhido pelo secret `IA_PROVEDOR` (`gemini` padrão / `claude`); a troca não exige deploy.
+- Login validado com `@supabase/server` (`withSupabase({ auth: "user" })`): o projeto usa chaves JWT ES256.
+- Deploy: `npx supabase functions deploy extrair-item --project-ref <ref> --use-api` (sem Docker; o CLI
+  já foi logado pelo usuário). Checagem de tipos: `npx deno check index.ts` dentro da pasta da função.
+- Detalhes, secrets e passo a passo em [supabase/README.md](supabase/README.md).
 - Repositório: https://github.com/guiNasc1/app-fala (privado), branch `main`. `gh` CLI não instalado.
 - No Git Bash, comandos `adb` com caminhos precisam de `MSYS_NO_PATHCONV=1`.

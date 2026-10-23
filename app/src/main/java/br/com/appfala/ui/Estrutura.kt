@@ -41,7 +41,7 @@ import br.com.appfala.ui.tema.CoresCabecalho
  * preenche o meio.
  */
 @Composable
-fun EstruturaPrincipal(vm: AppViewModel) {
+fun EstruturaPrincipal(vm: AppViewModel, emissao: EmissaoViewModel) {
     // Voltar do Android numa aba qualquer leva ao Início; no Início, fecha o app (padrão do sistema).
     BackHandler(enabled = vm.aba != Aba.INICIO) { vm.irPara(Aba.INICIO) }
 
@@ -55,7 +55,7 @@ fun EstruturaPrincipal(vm: AppViewModel) {
             Box(Modifier.weight(1f)) {
                 when (vm.aba) {
                     Aba.INICIO -> TelaEmBreve(R.drawable.ic_inicio, "Início", "Aqui vão os gráficos com os valores de cada mês.")
-                    Aba.EMITIR -> TelaEmBreve(R.drawable.ic_emitir, "Emitir", "Aqui você vai ditar o orçamento ou a nota de serviço.")
+                    Aba.EMITIR -> TelaEmitir(emissao)
                     Aba.HISTORICO -> TelaEmBreve(R.drawable.ic_historico, "Histórico", "Aqui aparecem os documentos já emitidos.")
                     Aba.PERFIL -> TelaPerfil(vm)
                 }
